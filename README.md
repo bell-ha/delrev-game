@@ -59,7 +59,7 @@
 | 이름 | 권예진 | 김도연 | 김도현 | 이종하 |
 |:---:|:---:|:---:|:---:|:---:|
 |역할| Client Dev<br/> UI/UX Design | Graphic Design | Client Dev | Client Dev <br/> Sound Design |
-| Github | <a href="https://github.com/yejin1029"><img src="https://github.com/yejin1029.png" width="100" alt="GitHub Profile" /></a> | <a href="https://github.com/doyeon112"><img src="https://github.com/doyeon112.png" width="100" alt="GitHub Profile" /></a> | <a href="https://github.com/hitori839"><img src="https://github.com/hitori839.png" width="100" alt="GitHub Profile" /></a> | <a href="https://github.com/bell-ha"><img src="https://github.com/bell-ha.png" width="100" alt="GitHub Profile" /></a> |
+| Github | <a href="https://github.com/yejinkw"><img src="https://github.com/yejinkw.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/doyeon112"><img src="https://github.com/doyeon112.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/hitori839"><img src="https://github.com/hitori839.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/bell-ha"><img src="https://github.com/bell-ha.png" width="80" alt="GitHub Profile" /></a> |
 
 ---
 
