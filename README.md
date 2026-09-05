@@ -30,7 +30,11 @@
 <a id="1"></a>
 ## 1️⃣ 📌 프로젝트 개요
 
-**DelRev**는 플레이어가 다양한 환경(회사, 공장, 유치원, 가족 주택 등)에서 고유한 AI를 가진 몬스터들로부터 도망치며 생존해야 하는 풀-3D 스텔스 서바이벌 게임입니다.
+**플레이어는 가정용 도우미 로봇으로 위장한 스파이 로봇입니다.**
+
+두 헤지펀드 A사와 B사가 대립합니다. A사는 경쟁사 내부 정보를 얻기 위해, 가정용 로봇의 외형과 기능을 그대로 유지한 채 정보 수집과 침투가 가능하도록 프로그래밍된 도우미 로봇을 만듭니다. 그 로봇이 플레이어입니다.
+
+**DelRev**는 이 로봇이 가족 주택 · 유치원 · 연구소 · 공장에 들어가 임무를 수행하고, 고유한 AI를 가진 방해자들에게서 도망치며 생존하는 풀 3D 스텔스 서바이벌 게임입니다.
 
 플레이어는 **체력/스테미나**뿐 아니라, 게임의 핵심 자원인 **위험게이지**를 관리하며 은신과 이동 전략을 세워야 합니다.  
 각 스테이지는 독특한 배경과 특화된 AI 몬스터들을 특징으로 하며, **위험게이지를 낮게 유지하기 위한 스텔스 전술**, 아이템 수집, 상황 판단이 생존의 핵심입니다.
@@ -60,6 +64,25 @@
 |:---:|:---:|:---:|:---:|:---:|
 |역할| Client Dev<br/> UI/UX Design | Graphic Design | Client Dev | Client Dev <br/> Sound Design |
 | Github | <a href="https://github.com/yejinkw"><img src="https://github.com/yejinkw.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/doyeon112"><img src="https://github.com/doyeon112.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/hitori839"><img src="https://github.com/hitori839.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/bell-ha"><img src="https://github.com/bell-ha.png" width="80" alt="GitHub Profile" /></a> |
+
+<br>
+
+### 시스템별 담당
+
+| 시스템 | 담당 | 내용 |
+|---|---|---|
+| **플레이어** | **이종하** | `PlayerController` 싱글톤 · 피격 연출(카메라 흔들림 · 화면 플래시 · 사운드) · 발소리 · 동적 조준점 · 씬 전환 시 스탯 초기화 |
+| **위험게이지** | **이종하** | 채움/감소 · 4구간 틱 사운드 · `IDangerTarget` 설계 &nbsp;<sub>UI는 권예진</sub> |
+| **방해자 AI**<br><sub>가족주택 · 유치원 · 연구소</sub> | **이종하** | `Mom` · `Director`(인사→순찰→추격→분노) · `Teacher`(순찰형/고정형, 시야각 60°) · `DollMonsterAI`(웅크리면 미감지) · `SmartKid` 계열(조작 차단 + 수학 문제) · `Doctor` · `Researcher` · `SecurityGuard` |
+| **방해자 AI**<br><sub>공장</sub> | **이종하** · **권예진** | 이종하 — `FactoryManager`(순찰→추격→분노) · `Security_A` · `Security_B`(플래시로 시야 마비)<br>권예진 — `GuardRobot` · `DroneAI` · `WeldingRobot` · `TurretSentinel`<br>공동 — `FlameProjectile`(초당 피해 발사체 + URP 화염 VFX) · `Trap`(조작 금지 + 블랙 화면 점멸) |
+| **상호작용 · 경제** | **이종하** | 레버 → 기계 → 코인 환산 · 열쇠/시간제한 문 · 시계·속도 아이템 · 겹침 검사 랜덤 스포너 |
+| **사운드 · 연출** | **이종하** | 3D 공간 음향 설계 · 58개 제작 · 배경음악 작곡 · 컷신 Foley · 홍보 영상 &nbsp;<sub>↓ 아래 상세</sub> |
+| **UI/UX · 세이브 · 상점** | **권예진** | |
+| **그래픽** | **김도연** | 모델링 · 텍스처 · UI 아트 |
+| **저장소 운영** | **김도현** | 게임 로직 일부 공동 작성 |
+
+<sub>담당 구분은 이종하의 캡스톤 기말 보고서 「III. 나의 기여 내용」과 커밋 이력을 대조해 정리했습니다.<br>
+`Mom` · `Teacher` · `PlayerController`는 여러 명이 함께 작성했습니다.</sub>
 
 ---
 
@@ -94,6 +117,21 @@ flowchart LR
   - **인벤토리 제한**: 아이템 **최대 4개 소지**로 선택과 집중 유도
   - **위험게이지**: 플레이어의 ‘노출/리스크’를 나타내는 핵심 자원  
     - 특정 조건에서 **위험게이지가 증가/감소**하며, 임계치 도달 시 **치명적 페널티(게임오버급 이벤트)** 발생
+    - 게이지가 차오르는 것을 **숫자가 아니라 소리로 알린다.** 틱 간격과 볼륨을 4구간으로 나눠, 위험할수록 심장박동처럼 빨라진다
+
+      | 게이지 | 틱 간격 | 볼륨 |
+      |---|---|---|
+      | 0 ~ 30% | 1.5초 | 0 → 0.5 |
+      | 30 ~ 70% | 1.5 → 0.7초 | 0.5 → 0.7 |
+      | 70 ~ 90% | 0.7 → 0.3초 | 0.7 → 1.0 |
+      | 90 ~ 100% | **0.3 → 0.2초** | 1.0 |
+
+    - 100% 도달 시 **`IDangerTarget` 인터페이스**로 그 스테이지의 최종 방해자만 깨운다. 스테이지마다 구현이 다르므로 게이지 로직은 몬스터를 몰라도 된다
+
+      ```csharp
+      public interface IDangerTarget { void OnDangerGaugeMaxed(); }
+      // 구현: Mom(가족주택) · Director(유치원) · Doctor(연구소) · FactoryManager(공장)
+      ```
       ```mermaid
         flowchart LR
           A["플레이어 위치 체크"] --> B{"업무장소 내부"}
@@ -121,6 +159,23 @@ flowchart LR
 - **스테이지별 고유 몬스터**: 각 스테이지에 맞춘 개성 있는 몬스터와 패턴 설계
 - **다양한 행동 유형**: 패트롤/추적/공격/특수 행동 등 상황 기반 행동 변화
 - **탐지 메커닉**: 시야각·거리·상황 요소를 활용한 플레이어 인식 로직
+
+몬스터마다 **상태 집합을 따로 정의**했다. 같은 FSM을 돌려쓰지 않고, 그 몬스터가 실제로 할 수 있는 행동만 넣었다.
+
+| 스테이지 | 몬스터 | 상태 |
+|---|---|---|
+| 가족주택 | Mom | `None · Patrol · Chase · Return · Alert` |
+| | Dog | `Patrol · Chase · Return · Called` |
+| | BlueEyeCat / RedEyeCat | `Patrol · Aggressive (· Return)` |
+| 유치원 | Director | `Greeting · Patrol · Chase · Alert` |
+| | DollMonster | `Patrol · Chase` |
+| 연구소 | SecurityGuard | `Patrol · CCTV · Chase` |
+| | Doctor | `Patrol · Chase · Alert` |
+| | Researcher | `Idle · Chase · Return` |
+| 공장 | GuardRobot | `Idle · MovingToTurret · Patrolling · Chasing` |
+| | FactoryManager | `Patrol · Chase · Alert` |
+
+`SecurityGuard`는 CCTV를 확인하는 상태가, `Dog`는 부름을 받는 상태가, `GuardRobot`은 포탑으로 이동하는 상태가 따로 있다. **상태 이름이 곧 그 몬스터의 성격이다.**
 
 <details>
   <summary><b> 🏠 가정집 맵 몬스터 </b></summary>
@@ -153,10 +208,118 @@ flowchart LR
 - **Volume Lighting**: 분위기 연출을 위한 조명/볼륨 효과
 - **고품질 3D 모델**: 다양한 에셋 활용을 통한 씬 완성도 강화
 
-### 🔊 오디오 & 연출
-- **배경음악/효과음**: 상황별 몰입감 강화
-- **장면별 음성 디렉션**: 스테이지 분위기와 서사 전달 보조
-- **인트로 영상 재생**: 시작 연출을 위한 Intro 영상 플레이어
+### 🧩 트러블슈팅 — 씬을 넘어갈 때 아이템이 사라졌다
+
+플레이어는 회사 → 가족주택 → 유치원 → 공장을 오가며 **매번 씬을 새로 로드**한다.
+그런데 Unity는 씬을 언로드할 때 그 씬에 속한 오브젝트를 전부 파괴한다.
+**들고 있던 아이템도, 트레일러에 실어 둔 아이템도 같이 사라졌다.**
+
+원인이 하나가 아니었다. 네 겹이었다.
+
+**① `DontDestroyOnLoad`는 루트 오브젝트에만 걸린다**
+
+자식 오브젝트에 호출하면 **조용히 무시되고 부모와 함께 죽는다.** 아이템은 씬 오브젝트의 자식이었다.
+분리를 먼저 해야 했다.
+
+```csharp
+// Inventory.TryPickupItem
+go.transform.SetParent(null);   // ← 루트로 분리해야 DDOL이 걸린다
+DontDestroyOnLoad(go);
+go.SetActive(false);            // 들고 있는 상태 = 화면에서 감춤
+```
+
+**② 트레일러에 실은 아이템은 자식이라 또 사라졌다**
+
+트레일러에 담으면 자식이 되는데, 자식이 되는 순간 ①의 함정에 다시 걸린다.
+자식으로 넣으면서 **동시에 그 아이템 자신도 보호**하도록 했다.
+
+```csharp
+// CarTrigger.OnTriggerEnter
+other.transform.SetParent(transform);
+DontDestroyOnLoad(other.gameObject);   // 자식 아이템도 보호
+```
+
+**③ 씬을 다시 로드하면 트레일러가 두 개가 된다**
+
+살아남은 트레일러와 새 씬에 배치된 트레일러. 아이템이 어느 쪽에 붙는지가 매번 달랐다.
+`scene.name`으로 **누가 원본인지** 판별했다.
+
+```csharp
+if (t != gameObject && t.scene.name == "DontDestroyOnLoad")
+{
+    Destroy(gameObject);   // 나는 새로 로드된 쪽 → 사라진다
+    yield break;
+}
+```
+
+**④ 그리고 순서 — 이게 제일 까다로웠다**
+
+중복 판정이 끝나기 **전에** 트리거가 발동하면, 곧 파괴될 트레일러에 아이템이 붙는다.
+초기화가 끝나기 전 입력을 막는 플래그를 뒀다.
+
+```csharp
+private bool isValid = false;
+
+IEnumerator Start()          // Awake가 아니라 Start
+{
+    yield return null;       // 한 프레임 대기 — 기존 DDOL 오브젝트가 먼저 인식되도록
+    ...
+    isValid = true;
+}
+
+void OnTriggerEnter(Collider other)
+{
+    if (!isValid) return;    // 아직 준비 안 됐으면 받지 않는다
+```
+
+---
+
+**같은 뿌리에서 나온 문제들**
+
+| 증상 | 대응 |
+|---|---|
+| 씬을 넘어가도 체력·게이지가 이전 값 그대로 | `PlayerController.OnSceneLoaded` → `ResetStats()` 구독 |
+| 새 게임을 시작해도 이전 판 오브젝트가 남음 | `GlobalState.KillAllDontDestroyOnLoad()` — DDOL 씬 루트 전부 제거 |
+| 오브젝트는 지웠는데 `static Instance`가 살아 있음 | `Bootstrapper.EnsureAfterNewGame()`에서 수동 `null` 대입 |
+| 초기화 순서가 어긋남 | `[DefaultExecutionOrder(-3000)]` — `MapTracker`(-1000)보다 먼저 |
+
+**못 잡은 버그도 있다.** `Day`가 0으로 되돌아가는 현상이 있었는데 어디서 그러는지 찾지 못했다.
+그래서 대입되는 순간의 호출 스택을 찍게 했다.
+
+```csharp
+set {
+    _currentDay = value;
+    if (value == 0)
+        Debug.Log("[MapTracker] currentDay가 0으로 설정됨!\n" + System.Environment.StackTrace);
+}
+```
+
+원인을 잡을 때까지 사용자에게 영향이 가지 않도록, `Company` 진입 시 `Day`를 1로 올리는 **임시 방어**를 따로 뒀다.
+코드에도 "응급 패치"라고 적어 두었다 — 나중에 이게 정상 로직으로 오해되지 않도록.
+
+> **배운 것** — 오브젝트의 수명이 씬의 수명에 묶여 있다는 것,
+> 그리고 그 사슬이 `부모-자식` → `중복 인스턴스` → `초기화 순서` → `static 상태 잔존`으로 이어진다는 것.
+
+### 🔊 사운드 디자인
+
+3D 게임이라 소리가 위치와 방향에 따라 다르게 들립니다. 상황별 재생 스크립트와 음원을 함께 설계했습니다.
+
+**분류** — `AMB` 환경음 · `CHR` 플레이어가 내는 소리 · `EVT` 이벤트 · `MON` 방해자 · `SFX` 효과음 · `BGM` · `UI` (58개)
+
+**유치원 배경음악 — 동요를 무너뜨리는 방식**
+
+동요 한 곡을 기준으로 삼고, 그 위에 같은 곡을 **단2도** 올려 겹쳤습니다. 두 곡의 주파수를 미세하게 어긋나게 해 불안을 만들고,
+그다음에는 **증4도** — 가장 불안정한 음정 — 로 같은 동요를 겹쳤습니다.
+그리고 **모든 음악을 끊습니다.** 공백 자체가 공포가 됩니다. 공백이 끝나면 전곡이 한꺼번에 돌아옵니다.
+
+**위험게이지 틱** — 게이지를 숫자가 아니라 소리로 알립니다. 간격과 볼륨을 4구간으로 나눠 위험할수록 심장박동처럼 빨라집니다.
+
+**발소리** — 바닥 재질별로 변주를 두고, 이동 속도 3단계에 따라 간격을 바꾸며, 발이 닿는 순간 카메라를 흔듭니다.
+
+**상호작용 음향 연쇄** — 레버를 당기면 기계 회전음이 먼저 나고, 일정 시간 뒤 코인 소리가 이어집니다. 소리의 순서로 인과를 만듭니다.
+
+**컷신 · 인트로** — Foley 기법과 디지털 신스를 병행해 직접 제작하고, 움직임 · 카메라 컷 · 장면 전환에 타이밍을 맞췄습니다.
+경진대회 전시 부스용 **9컷 홍보 영상**도 직접 편집했습니다.
 
 ---
 
@@ -185,7 +348,11 @@ flowchart LR
 ## 5️⃣ 🎮 게임 화면 및 데모
 
 ### 🎥 데모 영상
-🔗 [DelRev_9cut.mov](https://drive.google.com/file/d/1LsHE2zvid1eV_s81filG7HnpXB0DrP9F/view?usp=sharing)
+
+| | |
+|---|---|
+| [**게임플레이**](https://youtu.be/M8obEdlshRk) | 주요 장면 캡처 |
+| [**스토리 영상**](https://youtu.be/TNu-wWInctg) | 사운드 디자인 — 이종하 |
 
 ### 🎨 UI/UX
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/497e1859-3dc1-4bf4-a430-496c6fabe979" />
@@ -212,6 +379,11 @@ flowchart LR
 <details>
   <summary> <b><i>폴더/파일 트리 펼쳐보기</i></b> </summary>
   
+스크립트 94개 · 9,862줄. 플레이어 · 아이템 · 몬스터 · 맵 · 저장 · 설정으로 나뉜다.
+
+<details>
+<summary><b>전체 디렉토리 구조 펼치기</b></summary>
+
 ```
 DelRev/
 ├── Assets/
@@ -340,6 +512,9 @@ DelRev/
 └── DelRev.sln                       # Visual Studio 솔루션
 
 ```
+
+</details>
+
 </details>
 
 ---
