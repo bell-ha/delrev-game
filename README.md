@@ -643,17 +643,3 @@ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
 </details>
-
-<br/>
-
-- **Unity 공식 문서**: https://docs.unity.com
-- **URP 문서**: https://docs.unity.com/Manual/universal-render-pipeline
-- **NavMesh 튜토리얼**: https://docs.unity.com/Manual/nav-mesh
-
-<br/>
-
-<div align="center">
-
-**Made with ❤️ using Unity**
-
-</div>
