@@ -68,7 +68,7 @@
 
 4인으로 시작해 2025년 7월부터는 3인이 이어받아 마무리했다. 시스템별 담당은 [6장 코드 구조](#6)에 정리했다.
 
-| 이름 | 권예진 | 김도연 | 김도현 | 이종하 |
+| 이름 | 권⁠예⁠진 | 김⁠도⁠연 | 김⁠도⁠현 | 이⁠종⁠하 |
 |:---:|:---:|:---:|:---:|:---:|
 |역할| Client Dev<br/> UI/UX Design | Graphic Design | Client Dev | Client Dev <br/> Sound Design |
 | Github | <a href="https://github.com/yejinkw"><img src="https://github.com/yejinkw.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/doyeon112"><img src="https://github.com/doyeon112.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/hitori839"><img src="https://github.com/hitori839.png" width="80" alt="GitHub Profile" /></a> | <a href="https://github.com/bell-ha"><img src="https://github.com/bell-ha.png" width="80" alt="GitHub Profile" /></a> |
@@ -434,7 +434,7 @@ void OnTriggerEnter(Collider other)
 | 오브젝트는 지웠는데 `static Instance`가 살아 있음 | `Bootstrapper.EnsureAfterNewGame()`에서 수동 `null` 대입 |
 | 초기화 순서가 어긋남 | `[DefaultExecutionOrder(-3000)]` — `MapTracker`(-1000)보다 먼저 |
 
-<sub>이 표의 대응 중 `GlobalState`와 `Bootstrapper`는 권예진이 작성한 파일이다. 증상을 좁히고 어디에 무엇을 걸어야 하는지 정하는 과정은 함께했다.</sub>
+<sub>이 표의 대응 중 `GlobalState`와 `Bootstrapper`는 권⁠예⁠진이 작성한 파일이다. 증상을 좁히고 어디에 무엇을 걸어야 하는지 정하는 과정은 함께했다.</sub>
 
 **못 잡은 버그도 있다.** `Day`가 0으로 되돌아가는 현상이 있었는데 어디서 그러는지 찾지 못했다.
 그래서 대입되는 순간의 호출 스택을 찍게 했다.
@@ -462,19 +462,19 @@ set {
 
 | 시스템 | 담당 | 내용 |
 |---|---|---|
-| **플레이어 · 인벤토리** | **이종하** | `PlayerController` 싱글톤 · 피격 연출(카메라 흔들림 · 화면 플래시 · 사운드) · 발소리 · 동적 조준점 · 스태미나 히스테리시스 · 4칸 인벤토리와 `IInventoryEffect` |
-| **위험게이지** | **이종하** | 채움/감소 · 4구간 틱 사운드 · `IDangerTarget` 설계 &nbsp;<sub>게이지 UI는 권예진</sub> |
-| **방해자 AI**<br><sub>가정주택 · 유치원 · 연구소</sub> | **이종하** | 방해자 11종 가운데 **8종을 직접 구현**했다. `Mom` · `Director` · `Teacher`(순찰형/고정형, 시야각 60°) · `DollMonsterAI`(웅크리면 미감지) · `SmartKid` 계열(수학 문제로 조작 차단) · `Doctor` · `Researcher` · `SecurityGuard`(게임 내 시각 근무 교대) · `CCTV`(3초 유예 후 경비원 호출) &nbsp;<sub>유치원 계열은 김도현이 만든 파일 위에 이어 작업했고, `TeacherManager`는 김도현 단독</sub> |
-| **방해자 AI**<br><sub>공장</sub> | **권예진** · **이종하** | 권예진 — `GuardRobot` · `DroneAI` · `DronePatrol` · `WeldingRobot` · `TurretSentinel` · `FlameProjectile`(초당 피해 발사체 + URP 화염 VFX)<br>이종하 — `FactoryManager` · `Security_A` · `Security_B`(플래시로 시야 마비)<br>공동 — `Trap`(조작 금지 + 블랙 화면 점멸) |
-| **상호작용 · 경제** | **이종하** | 레버 → 기계 → 코인 환산 · 열쇠/시간제한 문 · 시계·속도 아이템 · 겹침 검사 랜덤 스포너 |
-| **사운드 · 연출** | **이종하** | 3D 공간 음향 설계 · 58개 제작 · 배경음악 작곡 · 컷신 Foley · 홍보 영상 |
-| **세이브 · 부팅 · 전역 상태** | **권예진** | 314줄짜리 `SaveLoadManager` · `SaveData` · `ContinueLoader` · `NewGameInitializer` · **`Bootstrapper`** · **`GlobalState`**. 5장 트러블슈팅에서 쓰는 `KillAllDontDestroyOnLoad()`와 `EnsureAfterNewGame()`이 여기서 나왔다 |
-| **거점 UI · 상점** | **권예진** | 맵 선택 · 상점(`StorePanelController` · `StoreItemUI` · `WarningUI`) · `DayManager` / `DayUI` · `CoinUI` · 아이템 전달 알림 · 시작 화면 · 일시정지 메뉴 |
-| **환경 설정** | **권예진** | URP 볼륨 밝기 · 오디오 볼륨 · 창 모드. 설정값을 부팅 시 복원하는 `DisplayBoot` / `VolumeBoot` 포함 |
-| **그래픽** | **김도연** | 모델링 · 텍스처 · UI 아트. 스크립트가 아니라 에셋 쪽 작업이라 이 저장소의 줄 수에는 거의 잡히지 않는다 |
-| **저장소 운영** | **김도현** | 2025년 4월부터 7월까지 참여. 브랜치·머지 관리와 `3.Monster` 폴더 스테이지별 재편, 유치원 방해자 계열과 `SaveLoadUI`의 초기 구현 |
+| **플레이어 · 인벤토리** | **이⁠종⁠하** | `PlayerController` 싱글톤 · 피격 연출(카메라 흔들림 · 화면 플래시 · 사운드) · 발소리 · 동적 조준점 · 스태미나 히스테리시스 · 4칸 인벤토리와 `IInventoryEffect` |
+| **위험게이지** | **이⁠종⁠하** | 채움/감소 · 4구간 틱 사운드 · `IDangerTarget` 설계 &nbsp;<sub>게이지 UI는 권⁠예⁠진</sub> |
+| **방해자 AI**<br><sub>가정주택 · 유치원 · 연구소</sub> | **이⁠종⁠하** | 방해자 11종 가운데 **8종을 직접 구현**했다. `Mom` · `Director` · `Teacher`(순찰형/고정형, 시야각 60°) · `DollMonsterAI`(웅크리면 미감지) · `SmartKid` 계열(수학 문제로 조작 차단) · `Doctor` · `Researcher` · `SecurityGuard`(게임 내 시각 근무 교대) · `CCTV`(3초 유예 후 경비원 호출) &nbsp;<sub>유치원 계열은 김⁠도⁠현이 만든 파일 위에 이어 작업했고, `TeacherManager`는 김⁠도⁠현 단독</sub> |
+| **방해자 AI**<br><sub>공장</sub> | **권⁠예⁠진** · **이⁠종⁠하** | 권⁠예⁠진 — `GuardRobot` · `DroneAI` · `DronePatrol` · `WeldingRobot` · `TurretSentinel` · `FlameProjectile`(초당 피해 발사체 + URP 화염 VFX)<br>이⁠종⁠하 — `FactoryManager` · `Security_A` · `Security_B`(플래시로 시야 마비)<br>공동 — `Trap`(조작 금지 + 블랙 화면 점멸) |
+| **상호작용 · 경제** | **이⁠종⁠하** | 레버 → 기계 → 코인 환산 · 열쇠/시간제한 문 · 시계·속도 아이템 · 겹침 검사 랜덤 스포너 |
+| **사운드 · 연출** | **이⁠종⁠하** | 3D 공간 음향 설계 · 58개 제작 · 배경음악 작곡 · 컷신 Foley · 홍보 영상 |
+| **세이브 · 부팅 · 전역 상태** | **권⁠예⁠진** | 314줄짜리 `SaveLoadManager` · `SaveData` · `ContinueLoader` · `NewGameInitializer` · **`Bootstrapper`** · **`GlobalState`**. 5장 트러블슈팅에서 쓰는 `KillAllDontDestroyOnLoad()`와 `EnsureAfterNewGame()`이 여기서 나왔다 |
+| **거점 UI · 상점** | **권⁠예⁠진** | 맵 선택 · 상점(`StorePanelController` · `StoreItemUI` · `WarningUI`) · `DayManager` / `DayUI` · `CoinUI` · 아이템 전달 알림 · 시작 화면 · 일시정지 메뉴 |
+| **환경 설정** | **권⁠예⁠진** | URP 볼륨 밝기 · 오디오 볼륨 · 창 모드. 설정값을 부팅 시 복원하는 `DisplayBoot` / `VolumeBoot` 포함 |
+| **그래픽** | **김⁠도⁠연** | 모델링 · 텍스처 · UI 아트. 스크립트가 아니라 에셋 쪽 작업이라 이 저장소의 줄 수에는 거의 잡히지 않는다 |
+| **저장소 운영** | **김⁠도⁠현** | 2025년 4월부터 7월까지 참여. 브랜치·머지 관리와 `3.Monster` 폴더 스테이지별 재편, 유치원 방해자 계열과 `SaveLoadUI`의 초기 구현 |
 
-<sub>줄 소유 기준(`git blame`, `Assets/1.Script`) — 이종하 5,332 · 권예진 3,795 · 김도현 699 · 김도연 39.
+<sub>줄 소유 기준(`git blame`, `Assets/1.Script`) — 이⁠종⁠하 5,332 · 권⁠예⁠진 3,795 · 김⁠도⁠현 699 · 김⁠도⁠연 39.
 파일을 만든 사람과 지금 그 줄을 갖고 있는 사람이 다른 경우가 있어, 둘을 함께 보고 정리했다.</sub>
 
 ### 기술 스택
