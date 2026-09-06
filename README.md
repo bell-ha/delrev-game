@@ -39,19 +39,23 @@
 플레이어는 **체력/스테미나**뿐 아니라, 게임의 핵심 자원인 **위험게이지**를 관리하며 은신과 이동 전략을 세워야 합니다.  
 각 스테이지는 독특한 배경과 특화된 AI 몬스터들을 특징으로 하며, **위험게이지를 낮게 유지하기 위한 스텔스 전술**, 아이템 수집, 상황 판단이 생존의 핵심입니다.
 
-- **개발 기간:** 2025.03-2025.11
+- **개발 기간:** 2025.04 – 2026.01 (첫 커밋 ~ 마지막 개발 커밋)
 - **개발 엔진:** Unity 2022.3.47f1  
 - **개발 언어:** C#
 - **플랫폼**: PC (Windows/macOS)
 
 <details>
   <summary> 📊 상세 통계 </summary>
-  
-  - **총 C# 스크립트**: 200+ 파일
-  - **게임 씬**: 8개
-  - **구현된 몬스터 AI**: 10+ 유형
-  - **아이템 종류**: 회복, 속도부스트, 코인 등
-  - **코드 라인**: 10,000+ 라인
+
+  | | |
+  |---|---|
+  | 팀 작성 스크립트 | `Assets/1.Script` 기준 **94개 파일 · 9,862줄** |
+  | 저장소 커밋 | **234커밋** (전 브랜치 기준) |
+  | 게임 씬 | 8개 |
+  | 방해자 AI | **8종** (가족주택 3 · 유치원 4 · 연구소 3 · 공장 5, 일부 공용) |
+  | 사운드 | 58개 (`AMB` `CHR` `EVT` `MON` `SFX` `BGM` `UI`) |
+
+  <sub>`Assets/2.Download` 등 외부 구매·무료 에셋에 포함된 스크립트는 제외한 수치입니다.</sub>
 
 </details>
 
@@ -587,7 +591,7 @@ File > Build Settings > 플랫폼 선택 > Build
 <details>
   <summary> <b><i>상장 펼쳐보기</i></b> </summary>
 
-  <img src="award_2.jpeg" alt="2025 RIEF-FESTA Award" width="350"/>
+  <img src="docs/awards/grise-capstone-contest.jpg" alt="2025 RIEF-FESTA 장려상" width="350"/>
 </details>
 
 ### 🥉 2025 단국대학교 SW중심대학 캡스톤 페스티벌
@@ -599,7 +603,7 @@ File > Build Settings > 플랫폼 선택 > Build
 <details>
   <summary> <b><i>상장 펼쳐보기</i></b> </summary>
 
-  <img width="350" alt="image" src="https://github.com/user-attachments/assets/a8d59ae1-ed84-4938-833a-7758892d9dc4" />
+  <img src="docs/awards/sw-capstone-festival.jpg" alt="SW중심대학 캡스톤 페스티벌 장려상" width="350"/>
 </details>
 
 ---
