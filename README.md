@@ -36,7 +36,7 @@
 
 두 헤지펀드 A사와 B사가 대립한다. A사는 경쟁사의 내부 정보를 얻기 위해, 가정용 로봇의 외형과 기능을 그대로 유지한 채 정보 수집과 침투가 가능하도록 프로그래밍된 도우미 로봇을 만든다. 그 로봇이 플레이어다.
 
-**DelRev**는 이 로봇이 가정주택 · 유치원 · 연구소 · 공장에 잠입해 임무를 수행하고, 스테이지마다 다른 방해자에게서 도망치며 생존하는 3D 잠입 액션 게임이다.
+**DelRev**는 이 로봇이 가정주택 · 유치원 · 공장에 잠입해 임무를 수행하고, 스테이지마다 다른 방해자에게서 도망치며 생존하는 3D 잠입 액션 게임이다.
 
 플레이어는 체력과 스태미나뿐 아니라 **위험게이지**를 관리해야 한다. 들키지 않는 것과 할당량을 채우는 것을 동시에 해내야 하고, 둘은 서로 반대 방향으로 당긴다.
 
@@ -53,9 +53,9 @@
   | 팀 작성 스크립트 | `Assets/1.Script` 기준 **94개 파일 · 9,862줄** |
   | 저장소 커밋 | **234커밋** (전 브랜치 기준) |
   | 게임 씬 | `Assets/0.Scenes` 기준 9개 |
-  | FSM 방해자 | **11종** (`enum State`를 가진 몬스터 기준) |
+  | FSM 방해자 | **11종** (`enum State`를 가진 몬스터 기준 · 이 중 연구소 3종은 미출시) |
   | 방해자 스크립트 | `3.Monster` 30개 파일 · 4,376줄 |
-  | 사운드 | 58개 (`AMB` `CHR` `EVT` `MON` `SFX` `BGM` `UI`) |
+  | 사운드 | 57개 (`AMB` `CHR` `EVT` `MON` `SFX` `BGM` `UI`) |
 
   <sub>`Assets/2.Download` 등 외부 구매·무료 에셋에 포함된 스크립트와 오디오는 제외한 수치다.</sub>
 
@@ -84,7 +84,7 @@
 flowchart LR
     A["회사 맵<br/>Day N"] --> B["트레일러<br/>아이템 여부"]
     B -->|YES| C["아이템 제출"]
-    B -->|NO| D["맵 선택 및 이동<br/>가정주택 / 유치원 / 연구소 / 공장"]
+    B -->|NO| D["맵 선택 및 이동<br/>가정주택 / 유치원 / 공장"]
     C --> D
     D --> E["아이템 수집<br/>/위험게이지 관리<br/>/방해자 회피"]
     E --> F["트레일러에<br/>아이템 적재"]
@@ -102,7 +102,13 @@ flowchart LR
 
 <img width="600" alt="상점" src="https://github.com/user-attachments/assets/a5cdc3b3-d7d5-4b86-afa7-f77a9630820d" />
 
-**요구일(Day)** — 정해진 날짜마다 요구 코인량을 검사하고, 미달이면 게임 오버다.
+**요구일(Day)** — 정해진 날짜마다 요구 코인량을 검사하고, 미달이면 게임 오버가 되도록 설계했다.
+
+> 이 판정은 최종 빌드에 넣지 못했다. `checkDays`(4·7·10·13·16)와 `coinRequirements`
+> (5·10·15·20·25)는 `MapTracker`에 정의돼 있지만 `CoinUI`가 화면에 표시할 때만 읽고,
+> 실제 게임 오버 진입은 `PlayerController.Die()`(체력 0) 한 경로뿐이다.
+
+아래는 설계한 흐름이다.
 
 ```mermaid
 flowchart LR
@@ -115,7 +121,7 @@ flowchart LR
   F -->|NO| H["게임 오버"]
 ```
 
-플레이어가 동시에 관리하는 자원은 체력 · 스태미나 · 코인 · 위험게이지 넷이다.
+플레이어가 화면에서 계속 보는 것은 체력 · 스태미나 · 위험게이지 셋이고, 코인은 상점과 정산 화면에서 관리한다.
 
 <img width="600" alt="게임 화면 UI" src="https://github.com/user-attachments/assets/497e1859-3dc1-4bf4-a430-496c6fabe979" />
 
@@ -157,15 +163,18 @@ if (isRunning) {
 |---|---|
 | 가정주택 | 방이 나뉘어 있어 시야가 짧다 |
 | 유치원 | 낮은 가구가 많아 웅크림이 유효하다 |
-| 연구소 | 감시 카메라가 깔려 있다. 시야 안에 3초 이상 머물면 경비원이 온다 |
 | 공장 | 야적장과 외곽 두 구역. 넓게 트여 멀리 보이는 대신 엄폐물이 컨테이너뿐이고, 순찰 경로가 길어 타이밍을 재야 한다 |
+
+> 연구소는 방해자 AI 4종(`Doctor` · `Researcher` · `SecurityGuard` · `CCTV`, 456줄)까지
+> 구현했으나 맵 제작을 끝내지 못해 최종 빌드에서 제외했다.
+> `MapLocationSelector.cs:146`에 선택지가 주석으로 남아 있다.
 
 | | |
 |---|---|
-| <img width="380" alt="가정주택" src="docs/game/g-map-house.png" /> | <img width="380" alt="유치원" src="docs/game/g-map-kinder.png" /> |
-| 가정주택 — 방이 나뉘어 시야가 짧다 | 유치원 — 낮은 가구가 많다 |
-| <img width="380" alt="공장 야적장" src="docs/game/g-map-f1.png" /> | <img width="380" alt="공장 외곽" src="docs/game/g-map-factory.png" /> |
-| 공장 야적장 — 컨테이너가 유일한 엄폐물 | 공장 외곽 — 순찰 경로가 길다 |
+| <img width="380" alt="가정주택" src="docs/game/g-map-house.png" /> | <img width="380" alt="유치원 교실" src="docs/game/g-map-kinder.png" /> |
+| 가정주택 — 방이 나뉘어 시야가 짧다 | 유치원 교실 — 낮은 가구가 많다 |
+| <img width="380" alt="유치원 강당" src="docs/game/g-map-kinder-hall.png" /> | <img width="380" alt="공장 외곽" src="docs/game/g-map-factory.png" /> |
+| 유치원 강당 — 트여 있어 숨을 곳이 없다 | 공장 외곽 — 순찰 경로가 길다 |
 
 ### 위험게이지 — 눈이 아닌 귀로
 
@@ -188,7 +197,7 @@ if (isRunning) {
 
 ```mermaid
 flowchart LR
-  A["플레이어 위치 체크"] --> B{"업무 구역 내부"}
+  A["플레이어 위치 체크"] --> B{"업무 구역 내부<br/>AND 아직 100% 미도달"}
   B -->|YES| C["위험게이지 감소"]
   B -->|NO| D["위험게이지 증가"]
   D --> E{"위험게이지 = 100"}
@@ -200,7 +209,7 @@ flowchart LR
 
 ```csharp
 public interface IDangerTarget { void OnDangerGaugeMaxed(); }
-// 구현: Mom(가정주택) · Director(유치원) · Doctor(연구소) · FactoryManager(공장)
+// 구현: Mom(가정주택) · Director(유치원) · FactoryManager(공장) · Doctor(연구소, 미출시)
 ```
 
 ```csharp
@@ -217,10 +226,10 @@ if (targetMonster != null) targetMonster.OnDangerGaugeMaxed();
 
 잠입 게임에서 제일 화가 나는 순간은 **왜 들켰는지 모를 때**다. 그래서 방해자는 전부 무엇을 하면 들키는지가 플레이 중에 드러나도록 만들었다. 엄마는 접근하면 공격하고, 곰인형은 웅크리지 않은 플레이어만 공격하며, 선생님은 순찰과 감시 두 모드를 오간다.
 
-**즉시 발각되지 않는다.** 연구소의 CCTV는 플레이어를 보는 순간 경비원을 부르지 않는다. 시야 안에 3초 이상 머물러야 호출이 나간다. 스쳐 지나가는 것과 들키는 것을 구분해 주지 않으면, 플레이어는 자기가 무엇을 잘못했는지 모른 채 쫓기게 된다.
+**즉시 발각되지 않는다.** CCTV는 플레이어를 보는 순간 경비원을 부르지 않는다. 시야 안에 3초 이상 머물러야 호출이 나간다. 스쳐 지나가는 것과 들키는 것을 구분해 주지 않으면, 플레이어는 자기가 무엇을 잘못했는지 모른 채 쫓기게 된다.
 
 ```csharp
-// CCTV.cs — 감지는 CCTV가, 추격은 경비원이 한다
+// CCTV.cs (연구소 · 미출시) — 감지는 CCTV가, 추격은 경비원이 한다
 if (IsPlayerInView())
 {
     detectionTimer += Time.deltaTime;
@@ -235,7 +244,7 @@ else detectionTimer = 0f;              // 시야를 벗어나면 리셋
 
 감지하는 객체와 쫓아오는 객체를 분리해서, **CCTV를 피하는 것만으로 추격을 끊을 수 있게** 했다.
 
-연구소 CCTV는 경비원을, 가정주택 카메라는 개를, 공장 포탑은 경비 로봇을 부른다. 세 맵에서 같은 구조를 반복했다. 규칙이 일정해야 플레이어가 배울 수 있다고 판단했다.
+가정주택 카메라는 개를, 공장 포탑은 경비 로봇을, 연구소 CCTV는 경비원을 부른다. 감지와 추격을 분리하는 이 구조를 세 맵에 같은 형태로 넣었다. 규칙이 일정해야 플레이어가 배울 수 있다고 판단했다.
 
 **상태 집합이 곧 방해자의 성격**
 
@@ -248,7 +257,7 @@ else detectionTimer = 0f;              // 시야를 벗어나면 리셋
 | | BlueEyeCat / RedEyeCat | `Patrol · Aggressive (· Return)` |
 | 유치원 | Director | `Greeting · Patrol · Chase · Alert` |
 | | DollMonster | `Patrol · Chase` |
-| 연구소 | SecurityGuard | `Patrol · CCTV · Chase` |
+| 연구소 <sub>미출시</sub> | SecurityGuard | `Patrol · CCTV · Chase` |
 | | Doctor | `Patrol · Chase · Alert` |
 | | Researcher | `Idle · Chase · Return` |
 | 공장 | GuardRobot | `Idle · MovingToTurret · Patrolling · Chasing` |
@@ -298,12 +307,12 @@ public interface IInventoryEffect
 ```csharp
 // Inventory — 넣고 빼는 자리에서 인터페이스로만 묻는다
 if (item is IInventoryEffect effect) effect.OnAdd(player);
-if (itemToRemove is IInventoryEffect e2) e2.OnRemove(player);
+if (itemToRemove is IInventoryEffect effectRemove) effectRemove.OnRemove(player);
 
 // 아이템은 각자 자기 효과만 안다
 class SpeedBoostItem : Item, IInventoryEffect {
-    public void OnAdd(PlayerController p)    { p.isSpeedItemActive = true;  }
-    public void OnRemove(PlayerController p) { p.isSpeedItemActive = false; }
+    public void OnAdd(PlayerController player)    { player.isSpeedItemActive = true;  }
+    public void OnRemove(PlayerController player) { player.isSpeedItemActive = false; }
 }
 ```
 
@@ -323,7 +332,7 @@ class SpeedBoostItem : Item, IInventoryEffect {
 - **로딩 씬** — `SceneLoader` · `LoadingSceneController`
 - **설정** — 밝기 · 볼륨 · 창 모드. URP 볼륨으로 밝기를 조절한다
 
-<img width="600" alt="설정창" src="https://github.com/user-attachments/assets/3e7eee99-10a9-4d6c-91cf-319f5fc3b3c7" />
+<img width="600" alt="왼쪽 설정창(밝기 · 볼륨 · 창 모드 · json 저장), 오른쪽 타이틀 화면의 이어하기로 세이브 데이터 로드" src="https://github.com/user-attachments/assets/3e7eee99-10a9-4d6c-91cf-319f5fc3b3c7" />
 
 여기서 문제가 하나 터졌다. 씬을 넘어갈 때마다 아이템이 사라졌다. → [5장 트러블슈팅](#5)
 
@@ -334,11 +343,11 @@ class SpeedBoostItem : Item, IInventoryEffect {
 
 3D 게임이라 소리가 위치와 방향에 따라 다르게 들린다. 상황별 재생 스크립트와 음원을 함께 설계했다.
 
-**분류** — `AMB` 환경음 · `CHR` 플레이어가 내는 소리 · `EVT` 이벤트 · `MON` 방해자 · `SFX` 효과음 · `BGM` · `UI` (총 58개)
+**분류** — `AMB` 환경음 · `CHR` 플레이어가 내는 소리 · `EVT` 이벤트 · `MON` 방해자 · `SFX` 효과음 · `BGM` · `UI` (총 57개)
 
 | | |
 |---|---|
-| <img width="380" alt="인트로 사운드 세션" src="docs/sound/s-daw1.png" /> | <img width="380" alt="유치원 배경음악 세션" src="docs/sound/s-daw2.png" /> |
+| <img width="380" alt="인트로 사운드 세션" src="docs/sound/s-daw2.png" /> | <img width="380" alt="유치원 배경음악 세션" src="docs/sound/s-daw1.png" /> |
 | 인트로 — 뉴스 음성 · 기계음 · 발소리 · 앰비언스를 25개 트랙으로 쌓았다 | 유치원 배경음악 — 같은 동요를 단2도, 이어서 증4도로 겹쳤다 |
 
 **유치원 배경음악 — 동요를 무너뜨리는 방식**
@@ -464,10 +473,10 @@ set {
 |---|---|---|
 | **플레이어 · 인벤토리** | **이⁠종⁠하** | `PlayerController` 싱글톤 · 피격 연출(카메라 흔들림 · 화면 플래시 · 사운드) · 발소리 · 동적 조준점 · 스태미나 히스테리시스 · 4칸 인벤토리와 `IInventoryEffect` |
 | **위험게이지** | **이⁠종⁠하** | 채움/감소 · 4구간 틱 사운드 · `IDangerTarget` 설계 &nbsp;<sub>게이지 UI는 권⁠예⁠진</sub> |
-| **방해자 AI**<br><sub>가정주택 · 유치원 · 연구소</sub> | **이⁠종⁠하** | 방해자 11종 가운데 **8종을 직접 구현**했다. `Mom` · `Director` · `Teacher`(순찰형/고정형, 시야각 60°) · `DollMonsterAI`(웅크리면 미감지) · `SmartKid` 계열(수학 문제로 조작 차단) · `Doctor` · `Researcher` · `SecurityGuard`(게임 내 시각 근무 교대) · `CCTV`(3초 유예 후 경비원 호출) &nbsp;<sub>유치원 계열은 김⁠도⁠현이 만든 파일 위에 이어 작업했고, `TeacherManager`는 김⁠도⁠현 단독</sub> |
+| **방해자 AI**<br><sub>가정주택 · 유치원 · 연구소(미출시)</sub> | **이⁠종⁠하** | 직접 구현한 방해자는 다음과 같다. `Mom` · `Director` · `Teacher`(순찰형은 거리, 고정형은 시야각 60°) · `DollMonsterAI`(웅크리면 미감지) · `SmartKid` 계열(수학 문제로 조작 차단) · `Doctor` · `Researcher` · `SecurityGuard`(게임 내 시각 근무 교대) · `CCTV`(3초 유예 후 경비원 호출) &nbsp;<sub>유치원 계열은 김⁠도⁠현이 만든 파일 위에 이어 작업했고, `TeacherManager`는 김⁠도⁠현 단독</sub> |
 | **방해자 AI**<br><sub>공장</sub> | **권⁠예⁠진** · **이⁠종⁠하** | 권⁠예⁠진 — `GuardRobot` · `DroneAI` · `DronePatrol` · `WeldingRobot` · `TurretSentinel` · `FlameProjectile`(초당 피해 발사체 + URP 화염 VFX)<br>이⁠종⁠하 — `FactoryManager` · `Security_A` · `Security_B`(플래시로 시야 마비)<br>공동 — `Trap`(조작 금지 + 블랙 화면 점멸) |
 | **상호작용 · 경제** | **이⁠종⁠하** | 레버 → 기계 → 코인 환산 · 열쇠/시간제한 문 · 시계·속도 아이템 · 겹침 검사 랜덤 스포너 |
-| **사운드 · 연출** | **이⁠종⁠하** | 3D 공간 음향 설계 · 58개 제작 · 배경음악 작곡 · 컷신 Foley · 홍보 영상 |
+| **사운드 · 연출** | **이⁠종⁠하** | 3D 공간 음향 설계 · 57개 제작 · 배경음악 작곡 · 컷신 Foley · 홍보 영상 |
 | **세이브 · 부팅 · 전역 상태** | **권⁠예⁠진** | 314줄짜리 `SaveLoadManager` · `SaveData` · `ContinueLoader` · `NewGameInitializer` · **`Bootstrapper`** · **`GlobalState`**. 5장 트러블슈팅에서 쓰는 `KillAllDontDestroyOnLoad()`와 `EnsureAfterNewGame()`이 여기서 나왔다 |
 | **거점 UI · 상점** | **권⁠예⁠진** | 맵 선택 · 상점(`StorePanelController` · `StoreItemUI` · `WarningUI`) · `DayManager` / `DayUI` · `CoinUI` · 아이템 전달 알림 · 시작 화면 · 일시정지 메뉴 |
 | **환경 설정** | **권⁠예⁠진** | URP 볼륨 밝기 · 오디오 볼륨 · 창 모드. 설정값을 부팅 시 복원하는 `DisplayBoot` / `VolumeBoot` 포함 |
@@ -645,7 +654,10 @@ git clone https://github.com/hitori839/DelRev.git
 | `Shift` | 달리기 (스태미나 소모) |
 | `Ctrl` | 웅크리기 — 발소리가 줄어든다 |
 | `Mouse` | 카메라 회전 |
-| `ESC` | 메뉴 |
+| `E` | 아이템 줍기 |
+| `G` | 아이템 버리기 |
+| `1` `2` `3` `4` · 휠 | 인벤토리 슬롯 선택 |
+| `F1` | 설정창 |
 
 <img width="600" alt="조작 배치" src="docs/game/g-controls.png" />
 
@@ -656,20 +668,21 @@ git clone https://github.com/hitori839/DelRev.git
 <a id="8"></a>
 ## 8. 수상 내역
 
-<img width="600" alt="캡스톤 페스티벌 전시 부스 — 방문자가 직접 플레이할 수 있게 세팅했다" src="docs/game/g-booth.jpg" />
+### 2025학년도 캡스톤디자인 경진대회 (G7 부문) — 장려상
 
-### 2025 RIEF-FESTA 캡스톤디자인 경진대회 (G7 부문) — 장려상
-
-- **주관:** 단국대학교 G-RISE 사업단
+- **주관:** 단국대학교 단국G-RISE사업단
+- **행사:** 2025 RIEF-FESTA
 - **선정:** 총 75팀 중 6팀 (대상 · 우수 · 장려)
 
 <details>
   <summary><b>상장 펼쳐보기</b></summary>
 
-  <img src="docs/awards/grise-capstone-contest.jpg" alt="2025 RIEF-FESTA 장려상" width="350"/>
+  <img src="docs/awards/grise-capstone-contest.jpg" alt="2025학년도 캡스톤디자인 경진대회 G7부문 장려상" width="350"/>
 </details>
 
 ### 2025 단국대학교 SW중심대학 캡스톤 페스티벌 — 장려상
+
+<img width="600" alt="SW중심대학 캡스톤 페스티벌 전시 부스 — 방문자가 직접 플레이할 수 있게 세팅했다" src="docs/game/g-booth.jpg" />
 
 - **팀명:** Soulmate
 - **주관:** 단국대학교 SW중심대학사업단
